@@ -1,0 +1,38 @@
+services:
+  - docker
+
+env:
+  global:
+    - COMMIT=${TRAVIS_COMMIT::8}
+
+before_install:
+  - docker build -q -t alpine-apim:${COMMIT} ./dockerfiles/alpine/apim
+  - docker build -q -t alpine-apim-analytics-dashboard:${COMMIT} ./dockerfiles/alpine/apim-analytics/dashboard
+  - docker build -q -t alpine-apim-analytics-worker:${COMMIT} ./dockerfiles/alpine/apim-analytics/worker
+
+  - docker build -q -t centos-apim:${COMMIT} ./dockerfiles/centos/apim
+  - docker build -q -t centos-apim-analytics-dashboard:${COMMIT} ./dockerfiles/centos/apim-analytics/dashboard
+  - docker build -q -t centos-apim-analytics-worker:${COMMIT} ./dockerfiles/centos/apim-analytics/worker
+
+  - docker build -q -t ubuntu-apim:${COMMIT} ./dockerfiles/ubuntu/apim
+  - docker build -q -t ubuntu-apim-analytics-dashboard:${COMMIT} ./dockerfiles/ubuntu/apim-analytics/dashboard
+  - docker build -q -t ubuntu-apim-analytics-worker:${COMMIT} ./dockerfiles/ubuntu/apim-analytics/worker
+
+  - export VERSION=$(curl --silent "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+  - wget https://github.com/aquasecurity/trivy/releases/download/v${VERSION}/trivy_${VERSION}_Linux-64bit.tar.gz
+  - tar zxvf trivy_${VERSION}_Linux-64bit.tar.gz
+script:
+  - ./trivy --exit-code 0 --severity HIGH --no-progress alpine-apim:${COMMIT}
+  - ./trivy --exit-code 0 --severity HIGH --no-progress alpine-apim-analytics-dashboard:${COMMIT}
+  - ./trivy --exit-code 0 --severity HIGH --no-progress alpine-apim-analytics-worker:${COMMIT}
+
+  - ./trivy --exit-code 0 --severity HIGH --no-progress centos-apim:${COMMIT}
+  - ./trivy --exit-code 0 --severity HIGH --no-progress centos-apim-analytics-dashboard:${COMMIT}
+  - ./trivy --exit-code 0 --severity HIGH --no-progress centos-apim-analytics-worker:${COMMIT}
+
+  - ./trivy --exit-code 0 --severity HIGH --no-progress ubuntu-apim:${COMMIT}
+  - ./trivy --exit-code 0 --severity HIGH --no-progress ubuntu-apim-analytics-dashboard:${COMMIT}
+  - ./trivy --exit-code 0 --severity HIGH --no-progress ubuntu-apim-analytics-worker:${COMMIT}
+cache:
+  directories:
+    - $HOME/.cache/trivy

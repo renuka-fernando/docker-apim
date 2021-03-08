@@ -1,0 +1,98 @@
+name: Trivy Scan - APIM Alpine
+on: [push, pull_request]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Build an image from Dockerfile
+        run: |
+          docker build -q -t alpine-apim:${{ github.sha }} dockerfiles/alpine/apim
+          docker build -q -t alpine-apim-analytics-dashboard:${{ github.sha }} dockerfiles/alpine/apim-analytics/dashboard
+          docker build -q -t alpine-apim-analytics-worker:${{ github.sha }} dockerfiles/alpine/apim-analytics/worker
+
+          docker build -q -t centos-apim:${{ github.sha }} dockerfiles/centos/apim
+          docker build -q -t centos-apim-analytics-dashboard:${{ github.sha }} dockerfiles/centos/apim-analytics/dashboard
+          docker build -q -t centos-apim-analytics-worker:${{ github.sha }} dockerfiles/centos/apim-analytics/worker
+
+          docker build -q -t ubuntu-apim:${{ github.sha }} dockerfiles/ubuntu/apim
+          docker build -q -t ubuntu-apim-analytics-dashboard:${{ github.sha }} dockerfiles/ubuntu/apim-analytics/dashboard
+          docker build -q -t ubuntu-apim-analytics-worker:${{ github.sha }} dockerfiles/ubuntu/apim-analytics/worker
+      
+      - name: Run Trivy vulnerability scanner - alpine-apim
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'alpine-apim:${{ github.sha }}'
+          format: 'table'
+          exit-code: '0'
+#          ignore-unfixed: true
+#          severity: 'HIGH'
+#      - name: Run Trivy vulnerability scanner - alpine-apim-analytics-dashboard
+#        uses: aquasecurity/trivy-action@master
+#        with:
+#          image-ref: 'alpine-apim-analytics-dashboard:${{ github.sha }}'
+#          format: 'table'
+#          exit-code: '0'
+#          ignore-unfixed: true
+#          severity: 'HIGH'
+#      - name: Run Trivy vulnerability scanner - alpine-apim-analytics-worker
+#        uses: aquasecurity/trivy-action@master
+#        with:
+#          image-ref: 'alpine-apim-analytics-worker:${{ github.sha }}'
+#          format: 'table'
+#          exit-code: '0'
+#          ignore-unfixed: true
+#          severity: 'HIGH'
+
+      - name: Run Trivy vulnerability scanner - centos-apim
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'centos-apim:${{ github.sha }}'
+          format: 'table'
+          exit-code: '0'
+#          ignore-unfixed: true
+#          severity: 'HIGH'
+#      - name: Run Trivy vulnerability scanner - centos-apim-analytics-dashboard
+#        uses: aquasecurity/trivy-action@master
+#        with:
+#          image-ref: 'centos-apim-analytics-dashboard:${{ github.sha }}'
+#          format: 'table'
+#          exit-code: '0'
+#          ignore-unfixed: true
+#          severity: 'HIGH'
+#      - name: Run Trivy vulnerability scanner - centos-apim-analytics-worker
+#        uses: aquasecurity/trivy-action@master
+#        with:
+#          image-ref: 'centos-apim-analytics-worker:${{ github.sha }}'
+#          format: 'table'
+#          exit-code: '0'
+#          ignore-unfixed: true
+#          severity: 'HIGH'
+
+      - name: Run Trivy vulnerability scanner - ubuntu-apim
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'ubuntu-apim:${{ github.sha }}'
+          format: 'table'
+          exit-code: '0'
+#          ignore-unfixed: true
+#          severity: 'HIGH'
+#      - name: Run Trivy vulnerability scanner - ubuntu-apim-analytics-dashboard
+#        uses: aquasecurity/trivy-action@master
+#        with:
+#          image-ref: 'ubuntu-apim-analytics-dashboard:${{ github.sha }}'
+#          format: 'table'
+#          exit-code: '0'
+#          ignore-unfixed: true
+#          severity: 'HIGH'
+#      - name: Run Trivy vulnerability scanner - ubuntu-apim-analytics-worker
+#        uses: aquasecurity/trivy-action@master
+#        with:
+#          image-ref: 'ubuntu-apim-analytics-worker:${{ github.sha }}'
+#          format: 'table'
+#          exit-code: '0'
+#          ignore-unfixed: true
+#          severity: 'HIGH'
